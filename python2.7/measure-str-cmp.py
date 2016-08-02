@@ -9,7 +9,7 @@ import plotly.graph_objs as go
 from tqdm import tqdm
 
 TESTS = '../tests.csv'
-SAMPLES = 1000000
+SAMPLES = 2000000
 CHAR_OK = 'A'
 CHAR_FAIL = 'X'
 
