@@ -99,6 +99,4 @@ Then, `memcmp` is implemented in `glibc`. The real ASM implementation
 used by `glibc` will vary based on the CPU (64bit or 32bit, SSE
 capabilities, etc. see [here](https://github.com/kraj/glibc/tree/master/sysdeps/x86_64/multiarch)).
 
-```html
 <iframe width="900" height="800" frameborder="0" scrolling="no" src="https://plot.ly/~andres.riancho/1.embed"></iframe>
-```
