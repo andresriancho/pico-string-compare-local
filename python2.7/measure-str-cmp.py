@@ -7,9 +7,10 @@ import plotly
 import plotly.graph_objs as go
 
 from tqdm import tqdm
+from collections import OrderedDict
 
 TESTS = '../tests.csv'
-SAMPLES = 2000000
+SAMPLES = 100000
 CHAR_OK = 'A'
 CHAR_FAIL = 'X'
 
@@ -33,7 +34,7 @@ def load_tests():
     return tests
 
 
-def generate_tests(num_tests):
+def generate_strings(num_tests):
     tests = []
     base_string = CHAR_OK * num_tests
 
@@ -46,7 +47,7 @@ def generate_tests(num_tests):
 
 def measure_all_str_cmp(tests):
     ltime = time.time
-    temp_measurements = {}
+    temp_measurements = OrderedDict()
 
     # Init output
     for str_a, str_b in tests:
@@ -92,6 +93,44 @@ def measure_all_str_cmp(tests):
     return measurements
 
 
+def are_equal(str_a, str_b, delay=0.001):
+    """
+    Slow (when compared with memcmp) string equal implementation used to
+    test if the rest of my code is working properly.
+
+    >>> are_equal('a', 'b')
+    False
+
+    >>> are_equal('a', 'a')
+    True
+
+    >>> start = time.time()
+    >>> are_equal('aaaaaaaaa', 'aaaaaaaab')
+    False
+    >>> end = time.time()
+    >>> long = end-start
+
+    >>> start = time.time()
+    >>> are_equal('aaaa', 'aaab')
+    False
+    >>> end = time.time()
+    >>> short = end-start
+
+    >>> assert short * 2 < long
+
+    :return: True if the two strings are equal
+    """
+    if len(str_a) != len(str_b):
+        return False
+
+    for i in xrange(len(str_a)):
+        time.sleep(delay)
+        if str_a[i] != str_b[i]:
+            return False
+
+    return True
+
+
 def print_to_stdout(measurements):
     for measurement in measurements:
         print('%s,%s,%s,%s' % measurement)
@@ -119,7 +158,7 @@ def create_graph(measurements):
 
 if __name__ == '__main__':
     #tests = load_tests()
-    tests = generate_tests(128)
+    tests = generate_strings(128)
 
     measurements = measure_all_str_cmp(tests)
 
