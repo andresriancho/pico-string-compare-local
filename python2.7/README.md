@@ -76,7 +76,16 @@ In [1]: import plotly
 In [2]: plotly.tools.set_credentials_file(username='andres.riancho', api_key='...')
 ```
 
-## Results
+# Results
+
+## Environment
+ * Ubuntu 14.04
+ * Linux 3.13.0-91-generic #138-Ubuntu SMP Fri Jun 24 17:00:34 UTC 2016 x86_64
+ * Quad Core / 64-bit CPU / AMD Phenom(tm) II X4 945 Processor
+ * 3.00 GHz
+ * `ldd --version`: (Ubuntu EGLIBC 2.19-0ubuntu6.9) 2.19
+ 
+## Analysis
 
 The script creates a scatter graph with the data, which can be found
 [here](https://plot.ly/~andres.riancho/1.embed).
@@ -104,13 +113,29 @@ A very basic analysis of the data tells us that:
    compare 16 chars in common is higher than the one for 22; but lower
    than the one for 23.
 
+It would be difficult to state the time difference for CPython to compare
+strings with N and N+1 chars in common, because it is different for the N
+being chosen. Some examples are:
+
+ * N: 9, 0.505 ns
+ * N: 15, 6.065 ns
+
+Also note that for some (N, M) tuples where M >> N, the difference is
+negative (as explained before with 16 and 22).
+
+Research could be done to identify if the behaviour seen in my workstation
+can be reproduced in other 64-bit boxes. If the scatter plot for all analysis
+is similar / very similar, then it would be possible to use that fact to
+perform a timing attack against the string comparison function using a
+custom exploitation algorithm that would only work in this scenario.
+
 ## Naive string comparison
 
 The script also has a naive string compare function with an artificial
 delay. When generating a graph with this function the result is [a straight
 line](https://plot.ly/~andres.riancho/3.embed).
 
-## Analysis
+# Source code
 
 When comparing two strings using `==` CPython 2.7 uses [string_richcompare](https://hg.python.org/cpython/file/2.7/Objects/stringobject.c#l1192):
 
