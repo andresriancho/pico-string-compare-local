@@ -23,7 +23,8 @@ should be able to see and edit the commands associated with the highlighted kern
 Go down to the line starting with linux and add the `isolcpus=0` parameter
 to its end. Now press `Ctrl + x` to boot.
 
-Once your workstation has started, verify the kernel parameters using:
+Once your workstation has started, verify the new kernel parameter is present
+using:
 
 ```
 cat /proc/cmdline
