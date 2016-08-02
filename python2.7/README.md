@@ -68,3 +68,24 @@ watch -n1 grep ctxt /proc/`pidof python2.7`/status
 ## Documentation
 
 [Good documentation on how to use isolcpus](http://xmodulo.com/run-program-process-specific-cpu-cores-linux.html)
+
+## Analysis
+
+When comparing two strings using `==` CPython 2.7 uses [string_richcompare](https://hg.python.org/cpython/file/2.7/Objects/stringobject.c#l1192):
+
+```c
+    if (op == Py_EQ) {
+        /* Supporting Py_NE here as well does not save
+           much time, since Py_NE is rarely used.  */
+        if (Py_SIZE(a) == Py_SIZE(b)
+            && (a->ob_sval[0] == b->ob_sval[0]
+            && memcmp(a->ob_sval, b->ob_sval, Py_SIZE(a)) == 0)) {
+            result = Py_True;
+        } else {
+            result = Py_False;
+        }
+        goto out;
+    }
+```
+
+Then, `memcmp` is implemented in `glibc`
