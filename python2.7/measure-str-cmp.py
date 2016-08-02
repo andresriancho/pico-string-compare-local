@@ -156,7 +156,7 @@ def create_graph(measurements):
 
     data = [trace]
 
-    plot_url = py.plot(data, filename='python-str-cmp')
+    plot_url = py.plot(data, filename='python-str-cmp', fileopt='new')
     print('Plot URL: %s' % plot_url)
 
     # Plot offline
