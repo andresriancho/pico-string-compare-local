@@ -1,9 +1,17 @@
 #!/bin/env python2.7
 
 import time
+import random
+
+import plotly
+import plotly.graph_objs as go
+
+from tqdm import tqdm
 
 TESTS = '../tests.csv'
-SAMPLES = 10000000
+SAMPLES = 1000000
+CHAR_OK = 'A'
+CHAR_FAIL = 'X'
 
 
 def load_tests():
@@ -15,37 +23,105 @@ def load_tests():
 
     for line in file(TESTS):
         line = line.strip()
+
+        if not line:
+            continue
+
         str_a, str_b = line.split(',')
         tests.append((str_a, str_b))
 
     return tests
 
 
-def measure_str_cmp(str_a, str_b, samples):
-    total = 0.0
+def generate_tests(num_tests):
+    tests = []
+    base_string = CHAR_OK * num_tests
 
-    for _ in xrange(samples):
-        start = time.time()
+    for i in xrange(num_tests):
+        test = (CHAR_OK * i) + (CHAR_FAIL * (num_tests - i))
+        tests.append((base_string, test))
 
-        str_a == str_b
-
-        end = time.time()
-        total += end - start
-
-    return total
+    return tests
 
 
 def measure_all_str_cmp(tests):
+    ltime = time.time
+    temp_measurements = {}
+
+    # Init output
+    for str_a, str_b in tests:
+        temp_measurements[str_b] = 0.0
+
     # discard the first measurement, the first one seems to always take more
     # time
     str_a, str_b = tests[0]
-    measure_str_cmp(str_a, str_b, SAMPLES)
+    for _ in xrange(SAMPLES / 2):
+        str_a == str_b
 
-    for str_a, str_b in tests:
-        result = measure_str_cmp(str_a, str_b, SAMPLES)
-        print('%s,%s,%s,%s' % (str_a, str_b, SAMPLES, result))
+    # Now we measure the str compare function. Take interleaved measurements
+    # to account for CPU load / other processes / kernel using our core, context
+    # switching, etc.
+    pbar = tqdm(total=SAMPLES * len(tests))
+
+    for _ in xrange(SAMPLES):
+
+        random.shuffle(tests)
+
+        for str_a, str_b in tests:
+            start = ltime()
+
+            if str_a == str_b:
+                temp = True
+            else:
+                temp = False
+
+            end = ltime()
+            temp_measurements[str_b] += end - start
+
+        pbar.update(len(tests))
+
+    pbar.close()
+
+    # Convert the output to the expected format
+    measurements = []
+
+    for str_b in temp_measurements:
+        result = temp_measurements[str_b]
+        measurements.append((str_a, str_b, SAMPLES, result))
+
+    return measurements
+
+
+def print_to_stdout(measurements):
+    for measurement in measurements:
+        print('%s,%s,%s,%s' % measurement)
+
+
+def create_graph(measurements):
+    x_axys = []
+    y_axys = []
+
+    for i, (str_a, str_b, SAMPLES, result) in enumerate(measurements):
+        x_axys.append(i)
+        y_axys.append(result)
+
+    # Create a trace
+    trace = go.Scatter(
+        x=x_axys,
+        y=y_axys,
+        mode='markers'
+    )
+
+    data = [trace]
+
+    plotly.offline.plot(data, filename='python-str-cmp.html')
 
 
 if __name__ == '__main__':
-    tests = load_tests()
-    measure_all_str_cmp(tests)
+    #tests = load_tests()
+    tests = generate_tests(128)
+
+    measurements = measure_all_str_cmp(tests)
+
+    print_to_stdout(measurements)
+    create_graph(measurements)
