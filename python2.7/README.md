@@ -69,6 +69,13 @@ watch -n1 grep ctxt /proc/`pidof python2.7`/status
 
 [Good documentation on how to use isolcpus](http://xmodulo.com/run-program-process-specific-cpu-cores-linux.html)
 
+## Graph with Plotly
+
+```ipython
+In [1]: import plotly 
+In [2]: plotly.tools.set_credentials_file(username='andres.riancho', api_key='...')
+```
+
 ## Analysis
 
 When comparing two strings using `==` CPython 2.7 uses [string_richcompare](https://hg.python.org/cpython/file/2.7/Objects/stringobject.c#l1192):
@@ -92,4 +99,6 @@ Then, `memcmp` is implemented in `glibc`. The real ASM implementation
 used by `glibc` will vary based on the CPU (64bit or 32bit, SSE
 capabilities, etc. see [here](https://github.com/kraj/glibc/tree/master/sysdeps/x86_64/multiarch)).
 
-
+```html
+<iframe width="900" height="800" frameborder="0" scrolling="no" src="https://plot.ly/~andres.riancho/1.embed"></iframe>
+```

@@ -3,14 +3,14 @@
 import time
 import random
 
-import plotly
+import plotly.plotly as py
 import plotly.graph_objs as go
 
 from tqdm import tqdm
 from collections import OrderedDict
 
 TESTS = '../tests.csv'
-SAMPLES = 100000
+SAMPLES = 500000
 CHAR_OK = 'A'
 CHAR_FAIL = 'X'
 
@@ -98,6 +98,9 @@ def are_equal(str_a, str_b, delay=0.001):
     Slow (when compared with memcmp) string equal implementation used to
     test if the rest of my code is working properly.
 
+    If you replace `str_a == str_b` with `are_equal(str_a, str_b)` and run this
+    script you'll get a straight line in the output scatter graph.
+
     >>> are_equal('a', 'b')
     False
 
@@ -153,7 +156,11 @@ def create_graph(measurements):
 
     data = [trace]
 
-    plotly.offline.plot(data, filename='python-str-cmp.html')
+    plot_url = py.plot(data, filename='python-str-cmp')
+    print('Plot URL: %s' % plot_url)
+
+    # Plot offline
+    #plotly.offline.plot(data, filename='python-str-cmp.html')
 
 
 if __name__ == '__main__':
