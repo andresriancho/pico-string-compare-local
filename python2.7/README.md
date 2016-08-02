@@ -76,6 +76,40 @@ In [1]: import plotly
 In [2]: plotly.tools.set_credentials_file(username='andres.riancho', api_key='...')
 ```
 
+## Results
+
+The script creates a scatter graph with the data, which can be found
+[here](https://plot.ly/~andres.riancho/1.embed).
+
+A very basic analysis of the data tells us that:
+
+ * For some unknown reason (potentially glibc performance enhancements)
+   comparing strings of length 128 with 3 and 7 characters in common requires 
+   considerable more time than the same operation with 2 and 6 characters
+   in common
+    
+ * Comparing strings of length 128 with 0 to 15 chars in common is *almost*
+   constant in time (see previous point)
+ 
+ * [CPython's string_richcompare](https://hg.python.org/cpython/file/2.7/Objects/stringobject.c#l1192)
+   does not call `memcmp` when the first character is different, this makes
+   comparisons of strings where the first character is different much faster.
+  
+ * There is a considerable "bump" in the time consumed to compare strings
+   of length 128 with 107 and 108 characters in common.
+ 
+ * The time it takes to compare two strings of length 128 increases erratically
+   between 16 and 107 characters in common. It doesn't seem to be possible
+   to easily compare two measurements. For example the time it takes to
+   compare 16 chars in common is higher than the one for 22; but lower
+   than the one for 23.
+
+## Naive string comparison
+
+The script also has a naive string compare function with an artificial
+delay. When generating a graph with this function the result is [a straight
+line](https://plot.ly/~andres.riancho/3.embed).
+
 ## Analysis
 
 When comparing two strings using `==` CPython 2.7 uses [string_richcompare](https://hg.python.org/cpython/file/2.7/Objects/stringobject.c#l1192):
@@ -99,4 +133,3 @@ Then, `memcmp` is implemented in `glibc`. The real ASM implementation
 used by `glibc` will vary based on the CPU (64bit or 32bit, SSE
 capabilities, etc. see [here](https://github.com/kraj/glibc/tree/master/sysdeps/x86_64/multiarch)).
 
-<iframe width="900" height="800" frameborder="0" scrolling="no" src="https://plot.ly/~andres.riancho/1.embed"></iframe>
