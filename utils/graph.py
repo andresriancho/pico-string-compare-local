@@ -1,6 +1,7 @@
 #!/bin/env python2.7
 
 import sys
+import webbrowser
 
 import plotly.plotly as py
 import plotly.graph_objs as go
@@ -73,8 +74,13 @@ def create_graph(measurements, samples, language, title):
 
     plot_url = py.plot(fig,
                        filename='%s-str-cmp-%s' % (language, title),
-                       fileopt='new')
-    print('Plot URL: %s.embed' % plot_url)
+                       fileopt='new',
+                       auto_open=False)
+
+    plot_url += '.embed'
+    print('Plot URL: %s' % plot_url)
+
+    webbrowser.open(plot_url)
 
 
 if __name__ == '__main__':
