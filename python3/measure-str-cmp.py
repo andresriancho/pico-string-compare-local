@@ -1,5 +1,6 @@
 #!/bin/env python2.7
 
+import sys
 import time
 import random
 
@@ -10,7 +11,7 @@ from tqdm import tqdm
 from collections import OrderedDict
 
 TESTS = '../tests.csv'
-SAMPLES = 5000
+SAMPLES = 100000
 CHAR_OK = 'A'
 CHAR_FAIL = 'X'
 
@@ -71,7 +72,7 @@ def measure_all_str_cmp(tests):
         for str_a, str_b in tests:
             start = ltime()
 
-            if are_equal(str_a, str_b):
+            if str_a == str_b:
                 temp = True
             else:
                 temp = False
@@ -127,7 +128,7 @@ def are_equal(str_a, str_b, delay=0.001):
         return False
 
     for i in range(len(str_a)):
-        #time.sleep(delay)
+        time.sleep(delay)
         if str_a[i] != str_b[i]:
             return False
 
@@ -138,15 +139,15 @@ def print_to_stdout(measurements):
     for measurement in measurements:
         print('%s,%s,%s,%s' % measurement)
 
-    measurement_7 = measurements[7][3]
-    measurement_8 = measurements[8][3]
+    measurement_7 = measurements[7][3] * 1e9
+    measurement_8 = measurements[8][3] * 1e9
     diff_1 = (measurement_8 - measurement_7) / SAMPLES
 
-    measurement_15 = measurements[15][3]
-    measurement_16 = measurements[16][3]
+    measurement_15 = measurements[15][3] * 1e9
+    measurement_16 = measurements[16][3] * 1e9
     diff_2 = (measurement_16 - measurement_15) / SAMPLES
 
-    measurement_100 = measurements[100][3]
+    measurement_100 = measurements[100][3] * 1e9
     diff_3 = (measurement_100 - measurement_7) / SAMPLES
 
     print('Time difference between #8 and #7: %s' % diff_1)
@@ -157,6 +158,8 @@ def print_to_stdout(measurements):
 def create_graph(measurements):
     x_axys = []
     y_axys = []
+
+    title = sys.argv[1]
 
     for i, (str_a, str_b, SAMPLES, result) in enumerate(measurements):
         x_axys.append(i)
@@ -169,9 +172,15 @@ def create_graph(measurements):
         mode='markers'
     )
 
-    data = [trace]
+    layout = go.Layout(
+        title='Python3 - %s samples - %s' % (SAMPLES, title)
+    )
 
-    plot_url = py.plot(data, filename='python3-str-cmp-naive', fileopt='new')
+    fig = go.Figure(data=[trace], layout=layout)
+
+    plot_url = py.plot(fig,
+                       filename='python3-str-cmp-%s' % title,
+                       fileopt='new')
     print('Plot URL: %s.embed' % plot_url)
 
     # Plot offline
@@ -179,6 +188,10 @@ def create_graph(measurements):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('Usage: ./measure-str-cmp.py <title>')
+        sys.exit(1)
+
     #tests = load_tests()
     tests = generate_strings(128)
 
