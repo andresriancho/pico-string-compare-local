@@ -1,4 +1,4 @@
-# How to measure timing differences in Python 2.7
+# How to measure timing differences in Python 3.4.3
 
 ## Setup
 
