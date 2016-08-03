@@ -12,6 +12,7 @@ def load_results(file_name):
     :return: A list of tuples with the results
     """
     measurements = []
+    test_num = 0
 
     for line in file(file_name):
         line = line.strip()
@@ -19,8 +20,13 @@ def load_results(file_name):
         if not line:
             continue
 
-        test_num, str_a, str_b, samples, time_sum = line.split(',')
+        str_a, str_b, samples, time_sum = line.split(',')
+
+        samples = int(samples)
+        time_sum = float(time_sum)
+
         measurements.append((test_num, str_a, str_b, samples, time_sum))
+        test_num += 1
 
     return measurements
 
@@ -48,7 +54,7 @@ def create_graph(measurements, samples, language, title):
     x_axys = []
     y_axys = []
 
-    for i, (str_a, str_b, samples, result) in enumerate(measurements):
+    for i, str_a, str_b, samples, result in measurements:
         x_axys.append(i)
         y_axys.append(result)
 
@@ -73,7 +79,7 @@ def create_graph(measurements, samples, language, title):
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
-        print('Usage: ./graph.py <measurements> <language> <title>')
+        print('Usage: ./graph.py <results-file> <language> <title>')
         sys.exit(1)
 
     # Load results from file
