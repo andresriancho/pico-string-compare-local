@@ -17,11 +17,26 @@ javac strcmp.java
 sudo taskset 0x1 java strcmp | tee java-strcmp.csv
 ```
 
+## Context switches
+
+```
+watch -n1 grep ctxt /proc/`pgrep -f 'java strcmp' -n`/status
+```
+
 ## Graph
 
 ```
-python ../utils/graph.py java-strcmp.csv java-1.8.0_101-b13 strcmp
+python ../utils/graph.py java-strcmp.csv java-1.8.0_101-b13 String.equals
 ```
+
+# Analysis
+
+
+## Naive string comparison
+
+The code also has a naive string compare function with a byte-per-byte
+comparison and an artificial `Thread.sleep(1)`. When generating a graph
+with this function the result is [a straight line](https://plot.ly/~andres.riancho/61.embed).
 
 # Source code
 
@@ -52,5 +67,3 @@ which compares byte-per-byte:
         return false;
     }
 ```
-
-
