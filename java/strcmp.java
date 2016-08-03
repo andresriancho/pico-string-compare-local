@@ -61,7 +61,7 @@ public class strcmp {
 
     static void measureTimes(List<Tuple> tests)
     {
-        int samples = 500000;
+        int samples = 5000;
 
         boolean temp = false;
 
