@@ -88,3 +88,6 @@ which compares byte-per-byte:
         return false;
     }
 ```
+
+But the JVM might decide that its faster to run [this optimized code](https://github.com/openjdk-mirror/jdk7u-hotspot/blob/master/src/cpu/x86/vm/x86_64.ad#L10609),
+which calls [char_arrays_equals](https://github.com/openjdk-mirror/jdk7u-hotspot/blob/50bdefc3afe944ca74c3093e7448d6b889cd20d1/src/cpu/x86/vm/assembler_x86.cpp#L9946-L10057).
