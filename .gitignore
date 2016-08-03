@@ -89,6 +89,7 @@ ENV/
 .ropeproject
 
 # pico
-java/java-strcmp.csv
-java/strcmp.class
+java/java-*.csv
+java/*.class
+
 
