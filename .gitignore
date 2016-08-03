@@ -90,3 +90,5 @@ ENV/
 
 # pico
 java/java-strcmp.csv
+java/strcmp.class
+
