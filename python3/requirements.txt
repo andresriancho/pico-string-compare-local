@@ -1,2 +1,6 @@
 plotly
 tqdm
+numpy
+scipy
+stats==0.1.2a
+

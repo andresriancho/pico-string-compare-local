@@ -1,17 +1,21 @@
-#!/bin/env python2.7
+#!/bin/env python3
 
 import sys
 import time
 import random
+import webbrowser
 
+import numpy
 import plotly.plotly as py
 import plotly.graph_objs as go
 
+from stats import midhinge as midhinge_impl
+from scipy import stats
 from tqdm import tqdm
 from collections import OrderedDict
 
 TESTS = '../tests.csv'
-SAMPLES = 100000
+SAMPLES = 1000000
 CHAR_OK = 'A'
 CHAR_FAIL = 'X'
 
@@ -52,7 +56,7 @@ def measure_all_str_cmp(tests):
 
     # Init output
     for str_a, str_b in tests:
-        temp_measurements[str_b] = 0.0
+        temp_measurements[str_b] = []
 
     # discard the first measurement, the first one seems to always take more
     # time
@@ -78,7 +82,7 @@ def measure_all_str_cmp(tests):
                 temp = False
 
             end = ltime()
-            temp_measurements[str_b] += end - start
+            temp_measurements[str_b].append(end - start)
 
         pbar.update(len(tests))
 
@@ -88,10 +92,27 @@ def measure_all_str_cmp(tests):
     measurements = []
 
     for str_b in temp_measurements:
-        result = temp_measurements[str_b]
+        result = trimean(temp_measurements[str_b])
         measurements.append((str_a, str_b, SAMPLES, result))
 
     return measurements
+
+
+def median(samples):
+    return numpy.median(samples)
+
+
+def midhinge(samples):
+    """
+    The midhinge is halfway between the first and second hinges. It is a
+    better measure of central tendency than the midrange, and more robust
+    than the sample mean (more resistant to outliers).
+    """
+    return midhinge_impl(samples)
+
+
+def trimean(samples, trim=0.15):
+    return stats.trim_mean(samples, trim)
 
 
 def are_equal(str_a, str_b, delay=0.001):
@@ -180,8 +201,12 @@ def create_graph(measurements):
 
     plot_url = py.plot(fig,
                        filename='python3-str-cmp-%s' % title,
-                       fileopt='new')
-    print('Plot URL: %s.embed' % plot_url)
+                       fileopt='new',
+                       auto_open=False)
+
+    plot_url += '.embed'
+    print('Plot URL: %s' % plot_url)
+    webbrowser.open(plot_url)
 
     # Plot offline
     #plotly.offline.plot(data, filename='python-str-cmp.html')
