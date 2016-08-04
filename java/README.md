@@ -60,11 +60,11 @@ The results I'm getting from the Java program are confusing:
   * There are outliers in almost every measurement I make. And in each
   measurement the outlier is different:
   
-    * https://plot.ly/~andres.riancho/79.embed
-    * https://plot.ly/~andres.riancho/81.embed
-    * https://plot.ly/~andres.riancho/83.embed
-    * https://plot.ly/~andres.riancho/85.embed
-    * https://plot.ly/~andres.riancho/87.embed
+   * https://plot.ly/~andres.riancho/79.embed
+   * https://plot.ly/~andres.riancho/81.embed
+   * https://plot.ly/~andres.riancho/83.embed
+   * https://plot.ly/~andres.riancho/85.embed
+   * https://plot.ly/~andres.riancho/87.embed
     
   * If the outliers are removed from the graph (just select the area that
   doesn't contain them) you'll see a pattern where the time to compare
