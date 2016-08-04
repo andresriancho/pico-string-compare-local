@@ -1,7 +1,7 @@
 #!/bin/env python2.7
 
 import sys
-import webbrowser
+import subprocess
 
 import plotly.plotly as py
 import plotly.graph_objs as go
@@ -80,7 +80,7 @@ def create_graph(measurements, samples, language, title):
     plot_url += '.embed'
     print('Plot URL: %s' % plot_url)
 
-    webbrowser.open(plot_url)
+    subprocess.check_output(['google-chrome-stable', plot_url])
 
 
 if __name__ == '__main__':
