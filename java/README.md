@@ -65,7 +65,7 @@ The results I'm getting from the [Java program](https://github.com/andresriancho
 are confusing:
 
   * There are outliers in almost every measurement I make. And in each
-  measurement the outlier is different:
+  measurement the outliers are different:
   
    * https://plot.ly/~andres.riancho/79.embed
    * https://plot.ly/~andres.riancho/81.embed
