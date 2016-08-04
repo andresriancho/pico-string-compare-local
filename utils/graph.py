@@ -21,6 +21,10 @@ def load_results(file_name):
         if not line:
             continue
 
+        if not line.startswith('AAA'):
+            print('Ignoring line: "%s..."' % line[:10])
+            continue
+
         str_a, str_b, samples, time_sum = line.split(',')
 
         samples = int(samples)
