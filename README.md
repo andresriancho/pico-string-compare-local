@@ -33,7 +33,7 @@ sudo apt-get install util-linux
 Boot your linux kernel using these parameters:
 
 ```
-isolcpus=0 idle=poll
+isolcpus=0 idle=poll noht
 ```
 
 `isolcpus=0` will isolate the CPU (no processes will be assigned to it by the
@@ -44,6 +44,8 @@ only has once core.
 Without `idle=poll` the clock is stopped for a short period of time if
 the CPU is idle. Consequently, CPU ticks have different time durations.
 
+`noht` will disable hyperthreading in all CPU cores.
+
 To temporarily add a boot parameter to a kernel start your system and
 wait for the GRUB menu to show (if you don't see a GRUB menu, press and
 hold the left `Shift` key right after starting the system).
@@ -53,18 +55,20 @@ should be able to see and edit the commands associated with the highlighted kern
 Go down to the line starting with linux and add the `isolcpus=0` parameter
 to its end. Now press `Ctrl + x` to boot.
 
-Once your workstation has started, verify the new kernel parameter is present
-using:
+Once your workstation has started, verify the new kernel parameters are
+present using:
 
 ```
 cat /proc/cmdline
 ```
 
-Set other kernel settings:
+Set other operating system settings:
 
 ```
 sudo sh -c "echo "performance" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
 ```
+
+You can verify `hyperthreading` is disabled using `utils/ht-read.sh`.
 
 ## Documentation
 
