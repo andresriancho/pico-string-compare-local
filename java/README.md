@@ -99,9 +99,10 @@ to run Java like this in production.
 
 ## Naive string comparison
 
-The code also has a naive string compare function with a byte-per-byte
-comparison and an artificial `Thread.sleep(1)`. When generating a graph
-with this function the result is [a straight line](https://plot.ly/~andres.riancho/61.embed).
+The code also has [a naive string compare function](https://github.com/andresriancho/pico-string-compare-local/blob/master/java/strcmp.java#L39-L61)
+with a byte-per-byte comparison and an artificial `Thread.sleep(1)`.
+When generating a graph with this function the result is
+[a straight line](https://plot.ly/~andres.riancho/61.embed).
 
 # Source code
 
