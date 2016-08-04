@@ -44,6 +44,31 @@ python ../utils/graph.py java-strcmp.csv java-1.8.0_101-b13 String.equals
 
 # Analysis
 
+## Default settings
+
+The results I'm getting from the Java program are confusing:
+
+  * There are outliers in almost every measurement I make. And in each
+  measurement the outlier is different:
+  
+    * https://plot.ly/~andres.riancho/79.embed
+    * https://plot.ly/~andres.riancho/81.embed
+    * https://plot.ly/~andres.riancho/83.embed
+    * https://plot.ly/~andres.riancho/85.embed
+    * https://plot.ly/~andres.riancho/87.embed
+    
+  * If the outliers are removed from the graph (just select the area that
+  doesn't contain them) you'll see a pattern where the time to compare
+  the test strings increases; but still with a lot of dispersion between
+  each character.
+  
+Tried to increase the memory available to the Java VM to
+(256M)[https://plot.ly/~andres.riancho/95.embed] but that didn't seem to
+help.
+
+Also tried debugging the garbage collector to try to identify it as the
+noise source; but my Java skills are really bad.
+
 ## Running with `-Djava.compiler=NONE`
 
 The `-Djava.compiler=NONE` flag disables JIT, which makes a **huge difference**.
