@@ -27,8 +27,8 @@ python ../utils/graph.py ruby-strcmp.csv ruby-2.3.0p0 strcmp
  
 ## Drunk Ruby
 
-An initial version of the ruby script created graphs that indicated that
-[ruby compared strings in less than zero nanoseconds](https://plot.ly/~andres.riancho/107.embed).
+An initial version of [the ruby script](https://github.com/andresriancho/pico-string-compare-local/blob/master/ruby/measure-str-cmp.rb)
+created graphs that indicated that [ruby compared strings in less than zero nanoseconds](https://plot.ly/~andres.riancho/107.embed).
 
 I'm not sure why this is, most likely a problem with the precision used
 to store long numbers in Ruby. Fixed it by adding code that excludes
