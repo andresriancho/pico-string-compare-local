@@ -72,7 +72,7 @@ public class strcmp {
 
         String a = "";
         Random seed = new Random(42);
-        
+
         Map<String, Long> measurements = new LinkedHashMap<String, Long>();
 
         // Initialize result map
@@ -82,13 +82,13 @@ public class strcmp {
 
         for(int i = 0; i < samples; i++)
         {
-		    // Randomize test order
-		    Collections.shuffle(tests, seed);
+            // Randomize test order
+            Collections.shuffle(tests, seed);
 
             // Run all tests
-		    for (Tuple test : tests) {
-		        a = test.a;
-		        String b = test.b;
+            for (Tuple test : tests) {
+                a = test.a;
+                String b = test.b;
 
                 startTime = System.nanoTime();
 
