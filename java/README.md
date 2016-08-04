@@ -72,7 +72,7 @@ The results I'm getting from the Java program are confusing:
   each character.
   
 Tried to increase the memory available to the Java VM to
-(256M)[https://plot.ly/~andres.riancho/95.embed] but that didn't seem to
+[256M](https://plot.ly/~andres.riancho/95.embed) but that didn't seem to
 help.
 
 Also tried debugging the garbage collector to try to identify it as the
