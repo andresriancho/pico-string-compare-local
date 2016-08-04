@@ -80,6 +80,9 @@ In [2]: plotly.tools.set_credentials_file(username='andres.riancho', api_key='..
 ```
 
 ## Environment
+
+The results stored in this repository were generated using:
+ 
  * Ubuntu 14.04
  * Linux 3.13.0-91-generic #138-Ubuntu SMP Fri Jun 24 17:00:34 UTC 2016 x86_64
  * Quad Core / 64-bit CPU / AMD Phenom(tm) II X4 945 Processor

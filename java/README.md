@@ -1,6 +1,11 @@
 # How to measure timing differences in Java 1.8.0_101
 
-## Environment
+## Setup
+
+Follow the `Common steps for all languages` from the main README.md file,
+and then install `java`.
+
+The results shown in this page are for:
 
 ``` console
 $ java -version
@@ -32,9 +37,13 @@ sudo taskset 0x1 java -Djava.compiler=NONE strcmp | tee java-strcmp.csv
 
 ## Context switches
 
+You can measure the context switches in the java process using:
+
 ```
 watch -n1 grep ctxt /proc/`pgrep -f 'java strcmp' -n`/status
 ```
+
+(less is better)
 
 ## Graph
 
