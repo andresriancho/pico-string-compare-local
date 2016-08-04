@@ -1,9 +1,10 @@
 import java.io.*;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 
 
 public class strcmp {
@@ -61,7 +62,7 @@ public class strcmp {
 
     static void measureTimes(List<Tuple> tests)
     {
-        int samples = 5000;
+        int samples = 500000;
 
         boolean temp = false;
 
@@ -70,7 +71,8 @@ public class strcmp {
         long duration = 0;
 
         String a = "";
-
+        Random seed = new Random(42);
+        
         Map<String, Long> measurements = new LinkedHashMap<String, Long>();
 
         // Initialize result map
@@ -81,7 +83,7 @@ public class strcmp {
         for(int i = 0; i < samples; i++)
         {
 		    // Randomize test order
-		    Collections.shuffle(tests);
+		    Collections.shuffle(tests, seed);
 
             // Run all tests
 		    for (Tuple test : tests) {
