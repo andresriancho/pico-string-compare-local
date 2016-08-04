@@ -53,9 +53,16 @@ python ../utils/graph.py java-strcmp.csv java-1.8.0_101-b13 String.equals
 
 # Analysis
 
+I'm trying to measure the time it takes to compare two strings with
+different number of characters in common (0 to 127 chars in common).
+
 ## Default settings
 
-The results I'm getting from the Java program are confusing:
+Comparing two strings in Java is, by default, improved by JIT's intrinsic
+functions.
+
+The results I'm getting from the [Java program](https://github.com/andresriancho/pico-string-compare-local/blob/master/java/strcmp.java#L83-L104)
+are confusing:
 
   * There are outliers in almost every measurement I make. And in each
   measurement the outlier is different:
@@ -77,6 +84,9 @@ help.
 
 Also tried debugging the garbage collector to try to identify it as the
 noise source; but my Java skills are really bad.
+
+Need more research to identify better ways of measuring the `String.equals()`
+method.
 
 ## Running with `-Djava.compiler=NONE`
 
