@@ -2,6 +2,7 @@
 
 import sys
 import time
+import shelve
 import random
 import webbrowser
 
@@ -12,10 +13,9 @@ import plotly.graph_objs as go
 from stats import midhinge as midhinge_impl
 from scipy import stats
 from tqdm import tqdm
-from collections import OrderedDict
 
 TESTS = '../tests.csv'
-SAMPLES = 1000000
+SAMPLES = 5000000
 CHAR_OK = 'A'
 CHAR_FAIL = 'X'
 
@@ -52,16 +52,18 @@ def generate_strings(num_tests):
 
 def measure_all_str_cmp(tests):
     ltime = time.time
-    temp_measurements = OrderedDict()
+    db = shelve.open('db.shelve', flag='c', protocol=2)
+    temp_measurements = {}
 
     # Init output
     for str_a, str_b in tests:
         temp_measurements[str_b] = []
+        db[str_b] = []
 
     # discard the first measurement, the first one seems to always take more
     # time
     str_a, str_b = tests[0]
-    for _ in range(int(SAMPLES / 2)):
+    for _ in range(int(SAMPLES / 10)):
         str_a == str_b
 
     # Now we measure the str compare function. Take interleaved measurements
@@ -69,7 +71,7 @@ def measure_all_str_cmp(tests):
     # switching, etc.
     pbar = tqdm(total=SAMPLES * len(tests))
 
-    for _ in range(SAMPLES):
+    for i in range(SAMPLES):
 
         random.shuffle(tests)
 
@@ -86,16 +88,36 @@ def measure_all_str_cmp(tests):
 
         pbar.update(len(tests))
 
+        #
+        #   Move the items from memory to disk only once every N samples to
+        #   reduce the disk-io and make the test faster
+        #
+        if i % 50000 == 0:
+            save_to_db(temp_measurements, db)
+
+    save_to_db(temp_measurements, db)
     pbar.close()
 
     # Convert the output to the expected format
     measurements = []
 
-    for str_b in temp_measurements:
-        result = trimean(temp_measurements[str_b])
+    for str_b in sorted(db.keys(), reverse=True):
+        result = trimean(db[str_b])
         measurements.append((str_a, str_b, SAMPLES, result))
 
     return measurements
+
+
+def save_to_db(temp_measurements, db):
+    for key in temp_measurements:
+        if temp_measurements[key]:
+            # Save
+            saved_data = db[key]
+            saved_data.extend(temp_measurements[key])
+            db[key] = saved_data
+
+            # Clear
+            temp_measurements[key] = []
 
 
 def median(samples):
@@ -111,7 +133,7 @@ def midhinge(samples):
     return midhinge_impl(samples)
 
 
-def trimean(samples, trim=0.15):
+def trimean(samples, trim=0.10):
     return stats.trim_mean(samples, trim)
 
 
