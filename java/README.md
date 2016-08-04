@@ -58,8 +58,8 @@ different number of characters in common (0 to 127 chars in common).
 
 ## Default settings
 
-Comparing two strings in Java is, by default, improved by JIT's intrinsic
-functions.
+Comparing two strings in Java is, by default, improved by [JIT's intrinsic
+functions](https://github.com/andresriancho/pico-string-compare-local/tree/master/java#source-code).
 
 The results I'm getting from the [Java program](https://github.com/andresriancho/pico-string-compare-local/blob/master/java/strcmp.java#L83-L104)
 are confusing:
