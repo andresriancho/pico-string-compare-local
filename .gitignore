@@ -89,7 +89,7 @@ ENV/
 .ropeproject
 
 # pico
-java/java-*.csv
+java/*.csv
 java/*.class
 
-
+ruby/*.csv
