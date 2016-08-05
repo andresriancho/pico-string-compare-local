@@ -2,16 +2,8 @@
 
 import sys
 import time
-import shelve
 import random
-import webbrowser
 
-import numpy
-import plotly.plotly as py
-import plotly.graph_objs as go
-
-from stats import midhinge as midhinge_impl
-from scipy import stats
 from tqdm import tqdm
 
 TESTS = '../tests.csv'
@@ -26,15 +18,18 @@ def load_tests():
     :return: A list of tuples with the tests to run
     """
     tests = []
+    test_num = 0
 
-    for line in file(TESTS, encoding='utf-8'):
+    for line in open(TESTS, encoding='utf-8'):
         line = line.strip()
 
         if not line:
             continue
 
         str_a, str_b = line.split(',')
-        tests.append((str_a, str_b))
+        tests.append((test_num, str_a, str_b))
+
+        test_num += 1
 
     return tests
 
@@ -50,20 +45,22 @@ def generate_strings(num_tests):
     return tests
 
 
-def measure_all_str_cmp(tests):
+def measure_all_str_cmp(tests, title):
     ltime = time.time
-    db = shelve.open('db.shelve', flag='c', protocol=2)
+    zero_time_spent_count = 0
     temp_measurements = {}
 
-    # Init output
-    for str_a, str_b in tests:
-        temp_measurements[str_b] = []
-        db[str_b] = []
+    output_filename = 'db-%s.csv' % title
+    db = open(output_filename, 'w')
+
+    # Init temp measurement store
+    for test_num, str_a, str_b in tests:
+        temp_measurements[test_num] = []
 
     # discard the first measurement, the first one seems to always take more
     # time
-    str_a, str_b = tests[0]
-    for _ in range(int(SAMPLES / 10)):
+    test_num, str_a, str_b = tests[0]
+    for _ in range(int(SAMPLES / 100)):
         str_a == str_b
 
     # Now we measure the str compare function. Take interleaved measurements
@@ -75,16 +72,28 @@ def measure_all_str_cmp(tests):
 
         random.shuffle(tests)
 
-        for str_a, str_b in tests:
-            start = ltime()
+        for test_num, str_a, str_b in tests:
+            # Multiply by 10000000 to get rid of all decimals, this is a neat
+            # trick that reduces zero_time_spent_count to zero.
+            start = ltime() * 10000000
 
             if str_a == str_b:
                 temp = True
             else:
                 temp = False
 
-            end = ltime()
-            temp_measurements[str_b].append(end - start)
+            end = ltime() * 10000000
+            time_spent = end - start
+
+            if not time_spent:
+                zero_time_spent_count += 1
+                continue
+
+            if time_spent < 0:
+                print('Ignore negative time spent.')
+                continue
+
+            temp_measurements[test_num].append(time_spent)
 
         pbar.update(len(tests))
 
@@ -98,43 +107,19 @@ def measure_all_str_cmp(tests):
     save_to_db(temp_measurements, db)
     pbar.close()
 
-    # Convert the output to the expected format
-    measurements = []
-
-    for str_b in sorted(db.keys(), reverse=True):
-        result = trimean(db[str_b])
-        measurements.append((str_a, str_b, SAMPLES, result))
-
-    return measurements
+    if zero_time_spent_count:
+        msg = 'Ignored %s measurements because they were zero!'
+        print(msg % zero_time_spent_count)
 
 
 def save_to_db(temp_measurements, db):
     for key in temp_measurements:
-        if temp_measurements[key]:
+        for data_point in temp_measurements[key]:
             # Save
-            saved_data = db[key]
-            saved_data.extend(temp_measurements[key])
-            db[key] = saved_data
+            db.write('%s,%s\n' % (key, data_point))
 
-            # Clear
-            temp_measurements[key] = []
-
-
-def median(samples):
-    return numpy.median(samples)
-
-
-def midhinge(samples):
-    """
-    The midhinge is halfway between the first and second hinges. It is a
-    better measure of central tendency than the midrange, and more robust
-    than the sample mean (more resistant to outliers).
-    """
-    return midhinge_impl(samples)
-
-
-def trimean(samples, trim=0.10):
-    return stats.trim_mean(samples, trim)
+        # Clear
+        temp_measurements[key] = []
 
 
 def are_equal(str_a, str_b, delay=0.001):
@@ -178,71 +163,12 @@ def are_equal(str_a, str_b, delay=0.001):
     return True
 
 
-def print_to_stdout(measurements):
-    for measurement in measurements:
-        print('%s,%s,%s,%s' % measurement)
-
-    measurement_7 = measurements[7][3] * 1e9
-    measurement_8 = measurements[8][3] * 1e9
-    diff_1 = (measurement_8 - measurement_7) / SAMPLES
-
-    measurement_15 = measurements[15][3] * 1e9
-    measurement_16 = measurements[16][3] * 1e9
-    diff_2 = (measurement_16 - measurement_15) / SAMPLES
-
-    measurement_100 = measurements[100][3] * 1e9
-    diff_3 = (measurement_100 - measurement_7) / SAMPLES
-
-    print('Time difference between #8 and #7: %s' % diff_1)
-    print('Time difference between #16 and #15: %s' % diff_2)
-    print('Time difference between #100 and #7: %s' % diff_3)
-
-
-def create_graph(measurements):
-    x_axys = []
-    y_axys = []
-
-    title = sys.argv[1]
-
-    for i, (str_a, str_b, SAMPLES, result) in enumerate(measurements):
-        x_axys.append(i)
-        y_axys.append(result)
-
-    # Create a trace
-    trace = go.Scatter(
-        x=x_axys,
-        y=y_axys,
-        mode='markers'
-    )
-
-    layout = go.Layout(
-        title='Python3 - %s samples - %s' % (SAMPLES, title)
-    )
-
-    fig = go.Figure(data=[trace], layout=layout)
-
-    plot_url = py.plot(fig,
-                       filename='python3-str-cmp-%s' % title,
-                       fileopt='new',
-                       auto_open=False)
-
-    plot_url += '.embed'
-    print('Plot URL: %s' % plot_url)
-    webbrowser.open(plot_url)
-
-    # Plot offline
-    #plotly.offline.plot(data, filename='python-str-cmp.html')
-
-
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('Usage: ./measure-str-cmp.py <title>')
         sys.exit(1)
 
-    #tests = load_tests()
-    tests = generate_strings(128)
+    title = sys.argv[1]
 
-    measurements = measure_all_str_cmp(tests)
-
-    print_to_stdout(measurements)
-    create_graph(measurements)
+    tests = load_tests()
+    measure_all_str_cmp(tests, title)
