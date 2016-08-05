@@ -92,6 +92,7 @@ ENV/
 java/*.csv
 java/*.class
 
+python3/*.csv
+python2.7/*.csv
 ruby/*.csv
 
-db.shelve
